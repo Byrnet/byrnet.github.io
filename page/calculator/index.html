@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор оптимизации сметной стоимости | Audit & Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #dc2626;
+            --success-color: #059669;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+            --border-color: #d1d5db;
+            --bg-light: #f3f4f6;
+            --bg-white: #ffffff;
+            --tab-inactive: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .company-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .company-tagline {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .calculator-form {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Tabs Styles */
+        .tabs-container {
+            margin-bottom: 30px;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tab-button {
+            padding: 15px 25px;
+            background: var(--tab-inactive);
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s;
+            position: relative;
+            top: 2px;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: #d1d5db;
+            color: var(--text-dark);
+        }
+
+        .tab-button.active {
+            background: var(--bg-white);
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .type-card {
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-white);
+            position: relative;
+        }
+
+        .type-card:hover {
+            border-color: var(--secondary-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .type-card.selected {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .type-card.selected::after {
+            content: "✓";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .type-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .type-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .type-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .type-price span {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .type-description {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .required::after {
+            content: "*";
+            color: var(--accent-color);
+        }
+
+        input[type="number"],
+        select {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 15px;
+            font-family: inherit;
+            background-color: var(--bg-white);
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Savings Slider Styles */
+        .savings-section {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid var(--success-color);
+            border-radius: 4px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .savings-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .savings-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--success-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .savings-value-display {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--success-color);
+            line-height: 1;
+        }
+
+        .savings-value-display span {
+            font-size: 24px;
+        }
+
+        .slider-container {
+            margin: 25px 0;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .savings-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #a7f3d0;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .savings-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--success-color);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .savings-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .savings-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--success-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+        }
+
+        .savings-description {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 15px;
+            padding: 0 20px;
+        }
+
+        .results-panel {
+            background-color: #f8fafc;
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .results-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .results-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+
+        .results-currency {
+            font-size: 18px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .savings-result-box {
+            background-color: white;
+            border: 2px dashed var(--success-color);
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .savings-result-label {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .savings-result-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .savings-result-range {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .results-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .detail-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .detail-value.highlight {
+            color: var(--primary-color);
+        }
+
+        .notice-box {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .notice-title {
+            font-weight: 600;
+            color: #b45309;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #1e40af;
+        }
+
+        .document-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .type-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs-header {
+                flex-direction: column;
+            }
+            
+            .tab-button {
+                width: 100%;
+                text-align: center;
+                border: 1px solid var(--border-color);
+                margin-bottom: 5px;
+            }
+            
+            .tab-button.active {
+                border-bottom-color: var(--primary-color);
+            }
+            
+            .results-amount {
+                font-size: 28px;
+            }
+            
+            .savings-value-display {
+                font-size: 36px;
+            }
+            
+            .calculator-form {
+                padding: 25px;
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+            .print-only {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="company-logo">AUDIT & PROJECT</div>
+        <div class="company-tagline">Оптимизация строительных проектов</div>
+        <h1>Калькулятор сметной стоимости строительства</h1>
+        <p class="subtitle">Предварительный расчет стоимости строительства объектов в Республике Беларусь с учетом потенциала оптимизации</p>
+    </div>
+
+    <div class="calculator-form">
+        <form id="calcForm" onsubmit="return false;">
+            
+            <!-- Tabs Section -->
+            <div class="form-section">
+                <div class="section-title">
+                    <span>01</span>
+                    Выбор типа объекта строительства
+                </div>
+                
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button type="button" class="tab-button active" onclick="switchTab('residential', this)">Жилое строительство</button>
+                        <button type="button" class="tab-button" onclick="switchTab('commercial', this)">Коммерческие объекты</button>
+                        <button type="button" class="tab-button" onclick="switchTab('industrial', this)">Производственные</button>
+                        <button type="button" class="tab-button" onclick="switchTab('social', this)">Социальные объекты</button>
+                    </div>
+
+                    <!-- Residential Tab -->
+                    <div id="tab-residential" class="tab-content active">
+                        <div class="type-grid">
+                            <div class="type-card selected" onclick="selectType('apartment', 2600, this)">
+                                <div class="type-icon">🏢</div>
+                                <div class="type-title">Многоквартирный дом</div>
+                                <div class="type-price">2 600 <span>BYN/м²</span></div>
+                                <div class="type-description">Панельные, монолитные или кирпичные многоэтажные жилые дома. Высота 9-16 этажей.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('cottage', 2400, this)">
+                                <div class="type-icon">🏠</div>
+                                <div class="type-title">Коттедж / Таунхаус</div>
+                                <div class="type-price">2 400 <span>BYN/м²</span></div>
+                                <div class="type-description">Индивидуальные жилые дома 1-3 этажа. Кирпич, газобетон, каркас.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('economy', 2100, this)">
+                                <div class="type-icon">🏘️</div>
+                                <div class="type-title">Эконом-жилье</div>
+                                <div class="type-price">2 100 <span>BYN/м²</span></div>
+                                <div class="type-description">Малоэтажное жилье с базовой отделкой. Каркасно-щитовые, блоки.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commercial Tab -->
+                    <div id="tab-commercial" class="tab-content">
+                        <div class="type-grid">
+                            <div class="type-card" onclick="selectType('office', 3200, this)">
+                                <div class="type-icon">🏢</div>
+                                <div class="type-title">Бизнес-центр / Офис</div>
+                                <div class="type-price">3 200 <span>BYN/м²</span></div>
+                                <div class="type-description">Административные здания класса A, B. Вентилируемые фасады, премиум отделка.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('retail', 2900, this)">
+                                <div class="type-icon">🛒</div>
+                                <div class="type-title">Торговый центр / Магазин</div>
+                                <div class="type-price">2 900 <span>BYN/м²</span></div>
+                                <div class="type-description">ТРЦ, розничные сети, супермаркеты. Высокие требования к коммуникациям.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('hotel', 3500, this)">
+                                <div class="type-icon">🏨</div>
+                                <div class="type-title">Гостиница / Отель</div>
+                                <div class="type-price">3 500 <span>BYN/м²</span></div>
+                                <div class="type-description">Гостиничные комплексы, хостелы. Полный цикл отделки, меблировка.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('restaurant', 3100, this)">
+                                <div class="type-icon">🍽️</div>
+                                <div class="type-title">Ресторан / Кафе</div>
+                                <div class="type-price">3 100 <span>BYN/м²</span></div>
+                                <div class="type-description">Объекты общепита. Специализированные инженерные системы, дизайн.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Industrial Tab -->
+                    <div id="tab-industrial" class="tab-content">
+                        <div class="type-grid">
+                            <div class="type-card" onclick="selectType('factory', 2800, this)">
+                                <div class="type-icon">🏭</div>
+                                <div class="type-title">Завод / Фабрика</div>
+                                <div class="type-price">2 800 <span>BYN/м²</span></div>
+                                <div class="type-description">Производственные корпуса с тяжелым оборудованием. Монолитные конструкции.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('warehouse', 2200, this)">
+                                <div class="type-icon">📦</div>
+                                <div class="type-title">Склад / Логистический центр</div>
+                                <div class="type-price">2 200 <span>BYN/м²</span></div>
+                                <div class="type-description">Классы A, B, C. Высота до 12м, площадки под фуры.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('hangar', 1900, this)">
+                                <div class="type-icon">🛖</div>
+                                <div class="type-title">Ангар / Навес</div>
+                                <div class="type-price">1 900 <span>BYN/м²</span></div>
+                                <div class="type-description">Быстровозводимые металлические конструкции. Без отопления.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Tab -->
+                    <div id="tab-social" class="tab-content">
+                        <div class="type-grid">
+                            <div class="type-card" onclick="selectType('school', 2900, this)">
+                                <div class="type-icon">🎓</div>
+                                <div class="type-title">Школа / Университет</div>
+                                <div class="type-price">2 900 <span>BYN/м²</span></div>
+                                <div class="type-description">Учебные корпуса, аудитории, лаборатории. Специальные требования безопасности.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('hospital', 3400, this)">
+                                <div class="type-icon">🏥</div>
+                                <div class="type-title">Больница / Поликлиника</div>
+                                <div class="type-price">3 400 <span>BYN/м²</span></div>
+                                <div class="type-description">Медицинские учреждения. Стерильные помещения, спецоборудование.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('kindergarten', 2700, this)">
+                                <div class="type-icon">🧸</div>
+                                <div class="type-title">Детский сад</div>
+                                <div class="type-price">2 700 <span>BYN/м²</span></div>
+                                <div class="type-description">Дошкольные учреждения. Игровые зоны, спальни, пищеблоки.</div>
+                            </div>
+                            <div class="type-card" onclick="selectType('sport', 3100, this)">
+                                <div class="type-icon">🏊</div>
+                                <div class="type-title">Спортивный комплекс</div>
+                                <div class="type-price">3 100 <span>BYN/м²</span></div>
+                                <div class="type-description">Бассейны, фитнес-центры, стадионы. Влагоустойчивые материалы.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <span>02</span>
+                    Параметры объекта
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="area" class="required">Общая площадь (м²)</label>
+                        <input type="number" id="area" name="area" min="50" max="50000" value="1000" required oninput="calculate()">
+                        <span class="input-hint">Введите общую площадь здания</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="region">Регион строительства</label>
+                        <select id="region" name="region" onchange="calculate()">
+                            <option value="1.0" selected>г. Минск</option>
+                            <option value="0.95">Минская область</option>
+                            <option value="0.93">Брестская область</option>
+                            <option value="0.92">Витебская область</option>
+                            <option value="0.94">Гомельская область</option>
+                            <option value="0.91">Гродненская область</option>
+                            <option value="0.93">Могилевская область</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="floors">Этажность</label>
+                        <select id="floors" name="floors" onchange="calculate()">
+                            <option value="1">1 этаж</option>
+                            <option value="2">2 этажа</option>
+                            <option value="3" selected>3 этажа</option>
+                            <option value="5">5 этажей</option>
+                            <option value="9">9 этажей</option>
+                            <option value="16">16+ этажей</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="complexity">Категория сложности</label>
+                        <select id="complexity" name="complexity" onchange="calculate()">
+                            <option value="1.0" selected>II категория (стандарт)</option>
+                            <option value="1.15">III категория (сложная)</option>
+                            <option value="1.3">IV категория (особо сложная)</option>
+                            <option value="0.9">I категория (простая)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Slider Section -->
+            <div class="savings-section">
+                <div class="savings-header">
+                    <div class="savings-title">Прогнозируемая экономия от аудита</div>
+                    <div class="savings-value-display">
+                        <span id="savingsPercentDisplay">20</span><span>%</span>
+                    </div>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span>Минимум (10%)</span>
+                        <span>Стандарт (20%)</span>
+                        <span>Максимум (30%)</span>
+                    </div>
+                    <input type="range" id="savingsSlider" class="savings-slider" min="10" max="30" value="20" step="1" oninput="updateSavings(this.value)">
+                </div>
+                
+                <div class="savings-description">
+                    Регулируйте ожидаемый процент экономии. При аудите проектной документации компания Audit & Project гарантирует снижение сметной стоимости от 10% до 30% без изменения архитектурных решений.
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <div class="results-header">
+                    <div class="results-label">Предварительная сметная стоимость строительства</div>
+                    <div class="results-amount">
+                        <span id="totalAmount">2 600 000</span>
+                        <span class="results-currency">BYN</span>
+                    </div>
+                </div>
+
+                <div class="savings-result-box">
+                    <div class="savings-result-label">Возможная экономия при аудите проекта</div>
+                    <div class="savings-result-amount" id="savingsAmount">520 000 BYN</div>
+                    <div class="savings-result-range">Итоговая стоимость после оптимизации: <strong id="optimizedCost">2 080 000 BYN</strong></div>
+                </div>
+
+                <div class="results-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Выбранный тип объекта:</span>
+                        <span class="detail-value highlight" id="selectedType">Многоквартирный дом</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Базовая ставка за 1 м²:</span>
+                        <span class="detail-value highlight" id="baseRate">2 600 BYN</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Общая площадь:</span>
+                        <span class="detail-value" id="totalArea">1 000 м²</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Коэффициент региона:</span>
+                        <span class="detail-value" id="regionCoeff">× 1.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Коэффициент этажности:</span>
+                        <span class="detail-value" id="floorCoeff">× 1.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Итоговая ставка за 1 м²:</span>
+                        <span class="detail-value highlight" id="finalRate">2 600 BYN</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notice-box">
+                <div class="notice-title">
+                    <span>⚠</span>
+                    Важная информация
+                </div>
+                <p>Данный расчет является предварительным и носит ориентировочный характер. Фактическая сметная стоимость строительства определяется после:</p>
+                <ul style="margin-left: 20px; margin-top: 10px; margin-bottom: 10px;">
+                    <li>Разработки проектно-сметной документации (ПСД)</li>
+                    <li>Проведения инженерно-геологических изысканий</li>
+                    <li>Составления сводного сметного расчета (ССР)</li>
+                    <li>Прохождения государственной экспертизы</li>
+                </ul>
+                <p>Компания <strong>Audit & Project</strong> специализируется на аудите проектной документации и оптимизации сметной стоимости без изменения архитектурных решений.</p>
+            </div>
+
+            <button type="button" class="btn-primary no-print" onclick="requestAudit()">
+                <span>📋</span>
+                Заказать аудит проекта
+            </button>
+        </form>
+
+        <div class="document-info">
+            <p>Калькулятор разработан на основании данных Министерства архитектуры и строительства Республики Беларусь</p>
+            <p>Средняя стоимость 1 м² с господдержкой (2024): 1 735 BYN | Предельная стоимость (2025): до 2 790 BYN/м²</p>
+            <p style="margin-top: 10px;">© ООО «Audit & Project» — Аудит строительных проектов в Минске</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentBaseRate = 2600;
+    let currentTypeName = 'Многоквартирный дом';
+    let currentSavingsPercent = 20;
+
+    function switchTab(tabName, button) {
+        // Update buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        button.classList.add('active');
+
+        // Update content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById('tab-' + tabName).classList.add('active');
+
+        // Select first card in new tab
+        const firstCard = document.querySelector('#tab-' + tabName + ' .type-card');
+        if (firstCard) {
+            firstCard.click();
+        }
+    }
+
+    function selectType(type, rate, element) {
+        currentBaseRate = rate;
+        currentTypeName = element.querySelector('.type-title').textContent;
+        
+        // Update UI
+        document.querySelectorAll('.type-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        element.classList.add('selected');
+        
+        calculate();
+    }
+
+    function updateSavings(value) {
+        currentSavingsPercent = parseInt(value);
+        document.getElementById('savingsPercentDisplay').textContent = value;
+        calculate();
+    }
+
+    function calculate() {
+        const area = parseFloat(document.getElementById('area').value) || 0;
+        const region = parseFloat(document.getElementById('region').value);
+        const complexity = parseFloat(document.getElementById('complexity').value);
+        const floors = parseInt(document.getElementById('floors').value);
+
+        // Floor coefficients
+        let floorCoeff = 1.0;
+        if (floors === 1) floorCoeff = 0.95;
+        else if (floors === 2) floorCoeff = 0.98;
+        else if (floors === 3) floorCoeff = 1.0;
+        else if (floors === 5) floorCoeff = 1.05;
+        else if (floors === 9) floorCoeff = 1.15;
+        else if (floors === 16) floorCoeff = 1.25;
+
+        // Calculate final rate per m²
+        const finalRate = Math.round(currentBaseRate * region * floorCoeff * complexity);
+        
+        // Calculate total cost
+        const totalCost = Math.round(area * finalRate);
+        
+        // Calculate savings
+        const savingsAmount = Math.round(totalCost * (currentSavingsPercent / 100));
+        const optimizedCost = totalCost - savingsAmount;
+        
+        // Format numbers
+        const formatter = new Intl.NumberFormat('ru-RU');
+        
+        // Update display
+        document.getElementById('totalAmount').textContent = formatter.format(totalCost);
+        document.getElementById('savingsAmount').textContent = formatter.format(savingsAmount) + ' BYN';
+        document.getElementById('optimizedCost').textContent = formatter.format(optimizedCost) + ' BYN';
+        document.getElementById('selectedType').textContent = currentTypeName;
+        document.getElementById('baseRate').textContent = formatter.format(currentBaseRate) + ' BYN';
+        document.getElementById('totalArea').textContent = formatter.format(area) + ' м²';
+        document.getElementById('regionCoeff').textContent = '× ' + region.toFixed(2);
+        document.getElementById('floorCoeff').textContent = '× ' + floorCoeff.toFixed(2);
+        document.getElementById('finalRate').textContent = formatter.format(finalRate) + ' BYN';
+    }
+
+    function requestAudit() {
+        const area = document.getElementById('area').value;
+        const total = document.getElementById('totalAmount').textContent;
+        const savings = document.getElementById('savingsAmount').textContent;
+        const optimized = document.getElementById('optimizedCost').textContent;
+        const region = document.getElementById('region').options[document.getElementById('region').selectedIndex].text;
+        
+        const message = `ЗАЯВКА НА АУДИТ СТРОИТЕЛЬНОГО ПРОЕКТА
+
+Компания: ООО «Audit & Project»
+Дата: ${new Date().toLocaleDateString('ru-RU')}
+
+ИНФОРМАЦИЯ ОБ ОБЪЕКТЕ:
+• Тип объекта: ${currentTypeName}
+• Площадь: ${area} м²
+• Регион: ${region}
+• Предварительная сметная стоимость: ${total} BYN
+
+РЕЗУЛЬТАТЫ ПРЕДВАРИТЕЛЬНОГО РАСЧЕТА:
+• Возможная экономия: ${savings} (${currentSavingsPercent}%)
+• Стоимость после оптимизации: ${optimized}
+
+УСЛУГИ AUDIT & PROJECT:
+✓ Технический аудит проектной документации
+✓ Оптимизация сметной стоимости (10-30%)
+✓ Проверка соответствия нормативам РБ
+✓ Разработка рекомендаций по снижению затрат
+
+Наш аудитор свяжется с Вами в течение 1 рабочего дня.
+
+Телефон: +375 (XX) XXX-XX-XX
+Email: info@auditpro.by`;
+        
+        alert(message);
+    }
+
+    // Initialize calculation
+    calculate();
+</script>
+
+</body>
+</html>

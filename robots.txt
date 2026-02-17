@@ -1,0 +1,5 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://byrnet.github.io/sitemap.xml
+Sitemap: https://auditpro.by/sitemap.xml
