@@ -165,7 +165,7 @@ ${t.email.contact.details} ${contactForm.details}
             <a href="#solution" className="hover:text-indigo-600">{t.nav.solution}</a>
             <a href="#cases" className="hover:text-indigo-600">{t.nav.cases}</a>
             <a href="#team" className="hover:text-indigo-600">{t.nav.team}</a>
-            <a href="#contact" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">{t.nav.calculate}</a>
+            <a href="/calculator/" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">{t.nav.calculate}</a>
             
             {/* Language Switcher */}
             <div className="flex items-center gap-2 ml-2 border-l pl-4">
@@ -191,7 +191,7 @@ ${t.email.contact.details} ${contactForm.details}
               <a href="#solution" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.solution}</a>
               <a href="#cases" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.cases}</a>
               <a href="#team" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.team}</a>
-              <a href="#contact" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-center" onClick={() => setIsMenuOpen(false)}>{t.nav.calculate}</a>
+              <a href="/calculator/" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-center" onClick={() => setIsMenuOpen(false)}>{t.nav.calculate}</a>
               <div className="flex justify-center gap-4 pt-2 border-t">
                  <a href="/en/" className={`font-medium ${lang === 'en' ? 'text-indigo-600' : 'text-gray-500'}`}>EN</a>
                  <a href="/" className={`font-medium ${lang === 'ru' ? 'text-indigo-600' : 'text-gray-500'}`}>RU</a>
@@ -217,7 +217,7 @@ ${t.email.contact.details} ${contactForm.details}
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href="#contact" className="bg-indigo-600 text-white py-3 px-6 rounded-md font-medium shadow hover:bg-indigo-700 transition-colors">
+              <a href="/calculator/" className="bg-indigo-600 text-white py-3 px-6 rounded-md font-medium shadow hover:bg-indigo-700 transition-colors">
                 {t.hero.btn_calc}
               </a>
               <a href="#solution" className="py-3 px-6 rounded-md border hover:bg-gray-50 transition-colors">
@@ -590,6 +590,20 @@ ${t.email.contact.details} ${contactForm.details}
         </footer>
 
       </main>
+
+      {/* Floating Calculator Button */}
+      <a 
+        href="/calculator/" 
+        className="fixed bottom-8 right-8 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition-all hover:scale-110 flex items-center justify-center z-50 group"
+        title={lang === 'ru' ? 'Калькулятор стоимости' : 'Cost Calculator'}
+      >
+        <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap mr-0 group-hover:mr-2 text-sm font-medium">
+          {lang === 'ru' ? 'Калькулятор' : 'Calculator'}
+        </span>
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      </a>
     </div>
   );
 }
