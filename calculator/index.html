@@ -568,6 +568,43 @@
                 display: block;
             }
         }
+
+        /* Floating Back to Site Button */
+        .back-to-site-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-to-site-btn:hover {
+            background-color: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .back-to-site-btn {
+                top: 20px;
+                left: 20px;
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -976,6 +1013,10 @@ Email: info@auditpro.by`;
     // Initialize calculation
     calculate();
 </script>
+
+<a href="/" class="back-to-site-btn no-print" id="backToSiteBtn">
+    <span>←</span> Вернуться на сайт
+</a>
 
 </body>
 </html>
