@@ -1,7 +1,11 @@
-const { useState, useEffect } = React;
+const { useState, useEffect, useCallback } = React;
 
 const ServiceCard = ({ icon, title, paragraphs }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
 
   // Combine all paragraphs into one text for processing
   const fullText = paragraphs.join(" ");
@@ -25,7 +29,7 @@ const ServiceCard = ({ icon, title, paragraphs }) => {
       </div>
       {sentences.length > 2 && (
         <button 
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={toggleExpanded}
           className="text-indigo-600 text-sm font-medium mt-4 self-start hover:underline focus:outline-none"
         >
           {isExpanded ? "Свернуть" : "Далее..."}
@@ -40,9 +44,39 @@ function AuditLanding() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lang, setLang] = useState('ru');
 
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(prev => !prev);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
+
   // Form states
   const [estimateForm, setEstimateForm] = useState({ name: '', contact: '', typeIndex: 0, file: null });
   const [contactForm, setContactForm] = useState({ name: '', phone: '', details: '' });
+
+  const handleEstimateFormChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setEstimateForm(prev => ({
+      ...prev,
+      [name]: name === 'typeIndex' ? Number(value) : value
+    }));
+  }, []);
+
+  const handleEstimateFileChange = useCallback((e) => {
+    const file = e.target.files[0];
+    setFileName(file ? file.name : null);
+    setEstimateForm(prev => ({ ...prev, file }));
+  }, []);
+
+  const handleContactFormChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setContactForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
   
   // Submission states
   const [estimateSent, setEstimateSent] = useState(false);
@@ -177,7 +211,7 @@ ${t.email.contact.details} ${contactForm.details}
 
           <button 
             className="md:hidden p-2 rounded-md border"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={toggleMenu}
           >
             {t.nav.menu}
           </button>
@@ -187,11 +221,11 @@ ${t.email.contact.details} ${contactForm.details}
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t p-4 absolute top-full left-0 right-0 shadow-lg z-50">
             <nav className="flex flex-col gap-4 text-sm">
-              <a href="#services" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.services}</a>
-              <a href="#solution" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.solution}</a>
-              <a href="#cases" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.cases}</a>
-              <a href="#team" className="hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>{t.nav.team}</a>
-              <a href="/calculator/" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-center" onClick={() => setIsMenuOpen(false)}>{t.nav.calculate}</a>
+              <a href="#services" className="hover:text-indigo-600" onClick={closeMenu}>{t.nav.services}</a>
+              <a href="#solution" className="hover:text-indigo-600" onClick={closeMenu}>{t.nav.solution}</a>
+              <a href="#cases" className="hover:text-indigo-600" onClick={closeMenu}>{t.nav.cases}</a>
+              <a href="#team" className="hover:text-indigo-600" onClick={closeMenu}>{t.nav.team}</a>
+              <a href="/calculator/" className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-center" onClick={closeMenu}>{t.nav.calculate}</a>
               <div className="flex justify-center gap-4 pt-2 border-t">
                  <a href="/en/" className={`font-medium ${lang === 'en' ? 'text-indigo-600' : 'text-gray-500'}`}>EN</a>
                  <a href="/" className={`font-medium ${lang === 'ru' ? 'text-indigo-600' : 'text-gray-500'}`}>RU</a>
@@ -242,23 +276,26 @@ ${t.email.contact.details} ${contactForm.details}
 
               <form className="mt-4 space-y-3" onSubmit={handleEstimateSubmit}>
                 <input 
+                  name="name"
                   required 
                   placeholder={t.form.name_placeholder}
                   className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
                   value={estimateForm.name}
-                  onChange={(e) => setEstimateForm({...estimateForm, name: e.target.value})}
+                  onChange={handleEstimateFormChange}
                 />
                 <input 
+                  name="contact"
                   required 
                   placeholder={t.form.contact_placeholder}
                   className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
                   value={estimateForm.contact}
-                  onChange={(e) => setEstimateForm({...estimateForm, contact: e.target.value})}
+                  onChange={handleEstimateFormChange}
                 />
                 <select 
+                  name="typeIndex"
                   className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
                   value={estimateForm.typeIndex}
-                  onChange={(e) => setEstimateForm({...estimateForm, typeIndex: Number(e.target.value)})}
+                  onChange={handleEstimateFormChange}
                 >
                   {t.form.types.map((type, i) => <option key={i} value={i}>{type}</option>)}
                 </select>
@@ -270,11 +307,7 @@ ${t.email.contact.details} ${contactForm.details}
                       <input 
                         type="file" 
                         className="hidden" 
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          setFileName(file ? file.name : null);
-                          setEstimateForm({...estimateForm, file: file});
-                        }}
+                        onChange={handleEstimateFileChange}
                       />
                     </label>
                     <span className="text-xs text-gray-500 truncate max-w-[150px]">{fileName || t.form.file_none}</span>
@@ -530,25 +563,28 @@ ${t.email.contact.details} ${contactForm.details}
 
             <form className="bg-white rounded-lg p-6 text-gray-900" onSubmit={handleContactSubmit}>
               <input 
+                name="name"
                 required 
                 placeholder={t.contact.name_placeholder}
                 className="w-full border rounded px-3 py-2 mb-3 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
                 value={contactForm.name}
-                onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                onChange={handleContactFormChange}
               />
               <input 
+                name="phone"
                 required 
                 placeholder={t.contact.phone_placeholder}
                 className="w-full border rounded px-3 py-2 mb-3 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none"
                 value={contactForm.phone}
-                onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
+                onChange={handleContactFormChange}
               />
               <textarea 
+                name="details"
                 placeholder={t.contact.details_placeholder}
                 className="w-full border rounded px-3 py-2 mb-3 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none" 
                 rows={3}
                 value={contactForm.details}
-                onChange={(e) => setContactForm({...contactForm, details: e.target.value})}
+                onChange={handleContactFormChange}
               ></textarea>
               <div className="flex gap-2">
                 <button 
